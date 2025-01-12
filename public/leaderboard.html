@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leaderboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background-color: #f3f4f6; /* Light gray background */
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <header class="bg-purple-700 text-white p-4 flex justify-between items-center">
+    <h1 class="text-2xl font-bold">Leaderboard</h1>
+    <a href="/auth/logout" class="bg-white text-purple-700 px-4 py-2 rounded hover:bg-purple-100 transition">
+      Logout
+    </a>
+  </header>
+
+  <main class="container mt-6">
+    <div class="bg-white shadow-md rounded p-6">
+      <h2 class="text-xl font-semibold text-gray-700 mb-4">Leaderboard</h2>
+      <table class="table-auto w-full text-left border-collapse">
+        <thead>
+          <tr>
+            <th class="border-b-2 pb-2 text-gray-600">Rank</th>
+            <th class="border-b-2 pb-2 text-gray-600">Username</th>
+            <th class="border-b-2 pb-2 text-gray-600">Max Score</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboardTable">
+          <!-- Dynamic rows will be injected here -->
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer class="text-center py-4 text-gray-600">
+    Developed by <a href="#" class="text-purple-700 font-semibold">Prathyusha</a>
+  </footer>
+
+  <script>
+    const fetchLeaderboard = async () => {
+      try {
+        const response = await fetch('/leaderboard');
+        if (!response.ok) {
+          throw new Error('Failed to fetch leaderboard');
+        }
+  
+        const users = await response.json(); // Corrected
+        const leaderboardTable = document.getElementById('leaderboardTable');
+  
+        leaderboardTable.innerHTML = ''; // Clear existing rows
+  
+        users.users.forEach((user, index) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td class="border-b py-2">${index + 1}</td>
+            <td class="border-b py-2">${user.username}</td>
+            <td class="border-b py-2">${user.maxScore}</td>
+          `;
+          leaderboardTable.appendChild(row);
+        });
+
+      } catch (error) {
+        console.log('Error fetching leaderboard:', error);
+  
+        // User-friendly error message
+        alert('Failed to load leaderboard. Please try again later.');
+        const errorMessage = document.createElement('div');
+        errorMessage.textContent = 'Failed to load leaderboard. Please try again later.';
+        errorMessage.className = 'text-red-500 mt-4 text-center';
+        document.querySelector('main').appendChild(errorMessage);
+      }
+    };
+  
+    window.onload = fetchLeaderboard;
+  </script>
+  
+</body>
+</html>
