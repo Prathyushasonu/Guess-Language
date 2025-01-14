@@ -26,7 +26,7 @@ router.get('/register', (req, res)=> {
   res.sendFile('register.html', publicRootConfig);
 });
 
-router.get('/scores/leaderboard', (req,res)=>{
+router.get('/global/leaderboard', (req,res)=>{
   if(!req.session.user){
     return res.redirect('/');
   }

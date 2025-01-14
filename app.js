@@ -45,13 +45,5 @@ app.use('/languages', languagesRouter);
 app.use('/scores',scoresRouter);
 app.use('/leaderboard', leaderboardRouter);
 
-app.use('/hello', (req,res)=>{
-    if(req.session.viewCount === undefined){
-        req.session.viewCount=0;
-    }else{
-        req.session.viewCount++;
-    }
-    res.send('view count is: '+ req.session.viewCount);
-})
 app.use(express.static(path.join(__dirname, 'public')));
 module.exports = app;

@@ -13,6 +13,16 @@ const { connect } = require('http2');
         connection.disconnect();
         return;
     }
+    const logosFromGithubJson = Json.parse(
+        fs.readFileSync(
+            path.resolve(__dirname,'Technology.json'), 'utf-8'
+        )
+    )
+
+    const logostToAdd = Object.keys(logosFromGithubJson).map(key => {  
+        const tech =   `https://github.com/bablubambal/All_logo_and_pictures/tree/main/${logosFromGithubJson[key]}`
+        
+    });
     const languagesFromGithubJson = JSON.parse(
         fs.readFileSync(
             path.resolve(__dirname,'./data/languages-from-github.json'), 'utf-8'

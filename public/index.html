@@ -97,19 +97,66 @@
     .score-display:hover #maxScoreValue{
       color: #FF6347; /* Red when hovered */
     }
+    .gradient-text {
+      background: linear-gradient(90deg, #6d28d9, #f63be0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-          .container {
-        display: flex;
-        flex-direction: row;
-        justify-content: flex-start;
-        align-items: center;     
-        margin-left: 20px;          
-        padding: 10px;
-        gap :10px;
+    .close{
+      width: 80px;
+      height: 33px;
+      border-radius: 5px;
+
+    }
+    .container {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;     
+      margin-left: 20px;          
+      padding: 10px;
+      gap :10px;
+      width: 100%;
+    }
+      .dialog {
+        position: fixed;
+        top: 0;
+        left: 0;
         width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5); 
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000; 
       }
 
+        .dialog-content {
+          display: flex;
+          background: #d5d6f8;
+          padding: 20px;
+          border-radius: 10px;
+          width: 400px;
+          gap: 20px;
+          height: 200px;
+          text-align: center;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          flex-direction: column;
+          justify-content: space-between;
+          align-items: center; 
+        }
 
+        .dialog.show {
+          display: flex;
+        }
+
+        .font-size-large{
+          font-size: large;
+        }
+        .font-size-medium{
+          font-size: medium;
+        }
     </style>
   </head>
   <body onload="main()" class="flex min-w-100 min-h-[100vh] flex-col">
@@ -132,9 +179,18 @@
       </div>
     </main>
     <main class="flex flex-col items-center gap-7">
+      <h1 class="text-xl font-bold gradient-text">GUESS THE PROGRAMMING LANGUAGE</h1>
       <div class="language-image">
           <img class="w-32 h-32 object-contain" alt="Guess the language" />
       </div>
+      <div id="gameOverDialog" class="dialog">
+        <div class="dialog-content ">
+          <h3 class="font-bold font-size-large">Game Over!</h3>
+          <p class="font-size-medium">Your max score is: <span id="dialogMaxScore"></span></p>
+          <button class="bg-purple-700 close" id="closebutton" onclick="closeDialog()">Close</button>
+        </div>
+      </div>
+      
       <div class="guess-section", style="width: 300px;">
           <input type="text" id="userAnswer" placeholder="Enter your guess" class="border p-2 rounded" />
       </div>
@@ -166,6 +222,23 @@
           languageImg.setAttribute('data-lang-name', randomLanguage.name);
         };
 
+        const closeDialog = () =>{
+          console.log('called from here')
+          document.getElementById('gameOverDialog').classList.remove('show'); // Hide the dialog
+          window.location.href = '/global/leaderboard';
+          score = 0;
+          document.getElementById('scoreValue').textContent = score;
+        }
+        function showDialog(maxScore, score) {
+          const maxScoreValue = Math.max(maxScore, score); // Calculate the max score
+          document.getElementById('dialogMaxScore').textContent = maxScoreValue; // Update the content
+          document.getElementById('gameOverDialog').classList.add('show'); // Show the dialog
+        }
+
+        document.querySelector('.dialog-content').addEventListener('click', (event) => {
+          event.stopPropagation(); 
+        });
+
         const showNotification = (message, type) => {
           const notification = document.createElement('div');
           notification.textContent = message;
@@ -190,7 +263,7 @@
             displayRandomLanguage();
           } else {
             showNotification('Wrong! Try again.', 'error');
-            score--;
+            score-=5;
             document.getElementById('scoreValue').textContent = score;
           }
 
@@ -199,17 +272,18 @@
 
         document.querySelector('#skip').addEventListener('click', () => {
         displayRandomLanguage();
-        score -=5 // Prevent negative scores
+        score -=1 
         document.getElementById('scoreValue').textContent = score;
-        showNotification('Skipped! -5 points.', 'warning'); // Show a skip notification
+        showNotification('Skipped! -5 points.', 'warning'); 
       });
 
-
+      document.querySelector('#closebutton').addEventListener('click', ()=>{
+        closeDialog();
+      })
         document.querySelector('#endGame').addEventListener('click', async () => {
-        alert(`Game Over! Your max score was: ${maxScore}`);
-      
+          showDialog(maxScore, score); ;
+          document.getElementById('gameOverDialog').classList.add('show'); // Show the dialog
           if (user.value.maxScore < score) {
-              // Make a PUT request to update the score
               try {
                   const response = await fetch('/scores/updateScore', {
                       method: 'PUT',
@@ -217,7 +291,7 @@
                           'Content-Type': 'application/json',
                       },
                       body: JSON.stringify({
-                          score: score, // Send the current score
+                          score: score, 
                       }),
                   });
 
@@ -232,15 +306,8 @@
                   console.error('Network error:', error);
               }
           }
-          window.location.href = '/scores/leaderboard';
-      // Reset the score in the front-end
-          score = 0;
-          document.getElementById('scoreValue').textContent = score;
 
         });
-
-
-        // Render the first random language
         displayRandomLanguage();
       }
     </script>

@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 const Users = require('../models/User');
 const { default: authenticated } = require('../middleware/auth.middleware');
+const path = require('path');
 
 router.get("/", async (req, res) => {
     try {
@@ -15,7 +16,7 @@ router.get("/", async (req, res) => {
         console.error("Error at /leaderboard:", err.message);
         res.status(500).json({ message: "Failed to fetch leaderboard. Please try again later." });
     }
-});
+} );
 
 module.exports = router;
 
